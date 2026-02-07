@@ -20,4 +20,4 @@ if [ ! -f /data/bin/user/extensions.py ]; then
 fi
 
 # Call the original entrypoint
-exec /entrypoint.sh "$@"
+exec /home/weewx/entrypoint.sh "$@"
