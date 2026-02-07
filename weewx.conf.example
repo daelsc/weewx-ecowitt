@@ -112,7 +112,8 @@ loop_on_init = 1
 
 [Engine]
     [[Services]]
-        report_services = weewx.engine.StdPrint, weewx.engine.StdReport
+        # StdPrint removed - too verbose for Docker logs
+        report_services = weewx.engine.StdReport
         prep_services = weewx.engine.StdTimeSynch
         process_services = weewx.engine.StdConvert, weewx.engine.StdCalibrate, weewx.engine.StdQC, weewx.wxservices.StdWXCalculate
         xtype_services = weewx.wxxtypes.StdWXXTypes, weewx.wxxtypes.StdPressureCooker, weewx.wxxtypes.StdRainRater, weewx.wxxtypes.StdDelta
@@ -123,10 +124,26 @@ loop_on_init = 1
 ##############################################################################
 
 [Logging]
+    version = 1
+    disable_existing_loggers = False
+
     [[root]]
         level = INFO
         handlers = console,
-    [[handlers]]
-        [[[[console]]]]
+
+    [[loggers]]
+        [[[weewx]]]
             level = INFO
-            format = "%(message)s"
+            qualname = weewx
+
+    [[handlers]]
+        [[[console]]]
+            level = INFO
+            formatter = standard
+            class = logging.StreamHandler
+            stream = ext://sys.stdout
+
+    [[formatters]]
+        [[[standard]]]
+            format = '%(asctime)s %(levelname)s %(name)s: %(message)s'
+            datefmt = '%Y-%m-%d %H:%M:%S'
