@@ -1,0 +1,132 @@
+# WEEWX CONFIGURATION FILE - EXAMPLE
+# Copy this to your data volume as weewx.conf and customize
+
+##############################################################################
+
+debug = 0
+log_success = True
+log_failure = True
+version = 5.0.0
+loop_on_init = 1
+
+##############################################################################
+
+[Station]
+    location = "Your Location"
+    latitude = 0.0
+    longitude = 0.0
+    altitude = 100, foot
+    station_type = GW1000
+    rain_year_start = 1
+    week_start = 6
+
+##############################################################################
+
+[GW1000]
+    # Ecowitt Gateway driver configuration
+    # Supports: GW1000, GW1100, GW2000, WH2650, WH2680, WN1900
+
+    driver = user.gw1000
+
+    # IP address of your Ecowitt gateway
+    ip_address = 192.168.1.100
+    port = 45000
+
+    # Poll interval in seconds (default: 20)
+    poll_interval = 5
+
+    # Field mappings for piezo rain sensor (if using WS90)
+    [[field_map_extensions]]
+        rain = p_rain
+        stormRain = p_rainevent
+        rainRate = p_rainrate
+        dayRain = p_rainday
+        weekRain = p_rainweek
+        monthRain = p_rainmonth
+        yearRain = p_rainyear
+
+##############################################################################
+
+[StdRESTful]
+    [[StationRegistry]]
+        register_this_station = false
+
+    [[AWEKAS]]
+        enable = false
+
+    [[CWOP]]
+        enable = false
+
+    [[PWSweather]]
+        # Upload to PWSweather.com / aerisweather
+        enable = false
+        station = YOUR_STATION_ID
+        password = YOUR_PASSWORD
+
+    [[WOW]]
+        enable = false
+
+    [[Wunderground]]
+        enable = false
+
+##############################################################################
+
+[StdReport]
+    [[Defaults]]
+        [[[Units]]]
+            [[[[Groups]]]]
+                group_altitude = foot
+                group_speed2 = mile_per_hour2
+                group_pressure = inHg
+                group_rain = inch
+                group_rainrate = inch_per_hour
+                group_temperature = degree_F
+                group_degree_day = degree_F_day
+                group_speed = mile_per_hour
+
+##############################################################################
+
+[StdArchive]
+    archive_interval = 300
+    archive_delay = 15
+    record_generation = software
+    data_binding = wx_binding
+
+##############################################################################
+
+[DataBindings]
+    [[wx_binding]]
+        database = archive_sqlite
+        table_name = archive
+        manager = weewx.manager.DaySummaryManager
+        schema = schemas.wview_extended.schema
+
+##############################################################################
+
+[Databases]
+    [[archive_sqlite]]
+        database_name = archive/weewx.sdb
+        database_type = SQLite
+
+##############################################################################
+
+[Engine]
+    [[Services]]
+        report_services = weewx.engine.StdPrint, weewx.engine.StdReport
+        prep_services = weewx.engine.StdTimeSynch
+        process_services = weewx.engine.StdConvert, weewx.engine.StdCalibrate, weewx.engine.StdQC, weewx.wxservices.StdWXCalculate
+        xtype_services = weewx.wxxtypes.StdWXXTypes, weewx.wxxtypes.StdPressureCooker, weewx.wxxtypes.StdRainRater, weewx.wxxtypes.StdDelta
+        archive_services = weewx.engine.StdArchive
+        restful_services = weewx.restx.StdStationRegistry, weewx.restx.StdWunderground, weewx.restx.StdPWSweather, weewx.restx.StdCWOP, weewx.restx.StdWOW, weewx.restx.StdAWEKAS
+        data_services =
+
+##############################################################################
+
+[Logging]
+    [[root]]
+        level = INFO
+        handlers = console,
+    [[handlers]]
+        [[[[console]]]]
+            level = INFO
+            format = "%(message)s"
